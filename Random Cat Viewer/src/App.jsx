@@ -1,53 +1,49 @@
 import { useState, useEffect } from "react";
- 
 
 function App() {
   const [cat, setCat] = useState(null);
   const [status, setStatus] = useState("idle");
 
-  async function catLoad() {
-    try {
-      setStatus("loading");
-
-      const res = await fetch(
-        "https://api.freeapi.app/api/v1/public/cats/cat/random"
-      );
-
-      const data = await res.json();
-      
-       
-       
-      setCat(data?.data?.data?.imageUrl);
-      setStatus("success");
-    } catch (error) {
-      console.error(error);
-      setStatus("error");
-    }
-  }
-
   useEffect(() => {
-    catLoad();
+    async function loadCat() {
+      try {
+        setStatus("loading");
+
+        const res = await fetch(
+          "https://api.freeapi.app/api/v1/public/cats/cat/random"
+        );
+
+        const data = await res.json();
+        const imageUrl = data?.data?.data?.imageUrl;
+
+        setCat(imageUrl);
+        setStatus("success");
+      } catch (error) {
+        console.error(error);
+        setStatus("error");
+      }
+    }
+
+    loadCat();
   }, []);
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>🐱 Random Cat Viewer</h1>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+      <h1 className="text-3xl font-bold mb-6"> Random Cat Viewer</h1>
 
       {status === "loading" && <p>Loading...</p>}
-      {status === "error" && <p>Error loading cat 😿</p>}
+      {status === "error" && <p>Error loading cat</p>}
 
-      {cat && (
+      {cat && status === "success" && (
         <img
           src={cat}
-          alt="random cat"
-          style={{ width: "300px", borderRadius: "12px" }}
+          alt="cat"
+          className="w-72 h-72 object-cover rounded-xl"
         />
       )}
 
-      <br />
-
-      <button onClick={catLoad} style={{ marginTop: "20px" }}>
-        Next Cat 😺
+      <button onClick={() => window.location.reload()} className="mt-4">
+        Next Cat
       </button>
     </div>
   );
